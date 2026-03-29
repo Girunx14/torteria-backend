@@ -1,0 +1,24 @@
+
+# Entorno virtual
+venv/
+
+# Variables de entorno con credenciales
+.env
+
+# Imagenes subidas por usuarios
+uploads/*
+!uploads/.gitkeep
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
