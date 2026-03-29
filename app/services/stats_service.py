@@ -1,7 +1,8 @@
 # app/services/stats_service.py
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, text
 from decimal import Decimal
+from datetime import datetime, timedelta
 
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.product import Product
@@ -47,13 +48,15 @@ def get_stats(db: Session, days: int = 30) -> StatsResponse:
         TopProduct(
             product_id=row.product_id,
             product_name=row.product_name,
-            total_sold=row.total_sold,
+            total_sold=int(row.total_sold),
             total_revenue=Decimal(str(row.total_revenue)),
         )
         for row in top_raw
     ]
 
-    # --- Ventas por día (últimos N días) ---
+    # --- Ventas por día (últimos N días) --- 
+    since_date = datetime.now() - timedelta(days=days)
+
     daily_raw = (
         db.query(
             func.date(Order.created_at).label("date"),
@@ -61,25 +64,23 @@ def get_stats(db: Session, days: int = 30) -> StatsResponse:
             func.sum(Order.total).label("total_revenue"),
         )
         .filter(Order.status == OrderStatus.completed)
-        .filter(
-            Order.created_at >= func.date_sub(func.now(), func.interval(days, "DAY"))
-        )
+        .filter(Order.created_at >= since_date)
         .group_by(func.date(Order.created_at))
-        .order_by("date")
+        .order_by(func.date(Order.created_at))
         .all()
     )
 
     daily_sales = [
         DailySales(
             date=str(row.date),
-            total_orders=row.total_orders,
+            total_orders=int(row.total_orders),
             total_revenue=Decimal(str(row.total_revenue)),
         )
         for row in daily_raw
     ]
 
     return StatsResponse(
-        total_revenue=total_revenue,
+        total_revenue=round(total_revenue, 2),
         total_orders=total_orders,
         average_ticket=round(average_ticket, 2),
         top_products=top_products,

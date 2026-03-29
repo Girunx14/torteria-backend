@@ -1,4 +1,4 @@
-# app/main.py — versión actualizada completa
+# app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -6,9 +6,8 @@ from contextlib import asynccontextmanager
 import os
 
 from app.config import get_settings
-from app.database import verify_connection, engine
-from app.models import Base
-from app.routers import auth          # ← nuevo
+from app.database import verify_connection
+from app.routers import auth, categories, products, orders, stats
 
 settings = get_settings()
 
@@ -44,7 +43,11 @@ app.mount(
 )
 
 # Routers
-app.include_router(auth.router)       # ← nuevo
+app.include_router(auth.router)
+app.include_router(categories.router)
+app.include_router(products.router)
+app.include_router(orders.router)
+app.include_router(stats.router)
 
 
 @app.get("/", tags=["Health"])
