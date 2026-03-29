@@ -32,7 +32,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173", 
-        "https://torteria-frontend.vercel.app"
+        "https://torteria-18.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
