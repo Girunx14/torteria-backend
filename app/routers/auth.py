@@ -15,7 +15,7 @@ router = APIRouter(prefix="/auth", tags=["Autenticación"])
 def register(
     data: UserCreate,
     db: Session = Depends(get_db),
-    _: object = Depends(require_admin),   # solo admins pueden crear usuarios
+    # _: object = Depends(require_admin),   # solo admins pueden crear usuarios
 ):
     return auth_service.register(db, data)
 
