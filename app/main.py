@@ -6,7 +6,8 @@ from contextlib import asynccontextmanager
 import os
 
 from app.config import get_settings
-from app.database import verify_connection
+from app.database import verify_connection, engine
+from app.models import Base
 
 settings = get_settings()
 
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
     # Código que corre al INICIAR el servidor
     print("🚀 Iniciando Torteria API...")
     verify_connection()
+    Base.metadata.create_all(bind=engine)
     os.makedirs(settings.UPLOAD_FOLDER, exist_ok=True)
     yield
     # Código que corre al DETENER el servidor
