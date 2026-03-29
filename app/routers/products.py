@@ -67,6 +67,7 @@ def delete_product(
     return product_service.delete(db, product_id)
 
 
+# app/routers/products.py — reemplaza el endpoint upload_image
 @router.post("/{product_id}/image", response_model=ProductResponse)
 def upload_image(
     product_id: int,
@@ -75,14 +76,9 @@ def upload_image(
     _=Depends(require_admin),
 ):
     """Sube o reemplaza la imagen de un producto. Solo admin."""
-
-    # Validar tipo de archivo
-    allowed_types = ["image/jpeg", "image/png", "image/webp"]
-    if file.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Formato no permitido. Usa JPG, PNG o WEBP",
-        )
+    from app.utils.image_handler import validate_and_save
+    image_url = validate_and_save(file)
+    return product_service.update_image(db, product_id, image_url)
 
     # Validar tamaño (5MB máximo)
     max_size = settings.MAX_IMAGE_SIZE_MB * 1024 * 1024
